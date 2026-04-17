@@ -1,42 +1,39 @@
 import streamlit as st
 from streamlit_ace import st_ace
 import requests
-import time
-import re
 
 st.set_page_config(page_title="FXCryptoTools Terminal", layout="wide")
 
-# --- CUSTOM CSS ---
+# Custom White Theme CSS
 st.markdown("""
     <style>
-    .main { background-color: #f0f2f6; }
-    .stButton>button { width: 100%; border-radius: 5px; }
-    .footer { text-align: center; color: #888; padding: 20px; }
+    .main { background-color: #f8f9fa; }
+    .stButton>button { background-color: #28a745; color: white; border-radius: 8px; height: 3em; font-weight: bold; }
+    .stButton>button:hover { background-color: #218838; color: white; }
+    .title-text { text-align: center; color: #1a202c; font-family: 'Segoe UI', sans-serif; }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🚀 FXCryptoTools MQL Lab")
+st.markdown("<h1 class='title-text'>🚀 FXCryptoTools Remote Lab</h1>", unsafe_allow_html=True)
+
+# --- SIDEBAR ---
 st.sidebar.title("💎 FXCryptoTools")
-st.sidebar.info("Professional Code Injection Hub")
+st.sidebar.markdown("---")
+st.sidebar.markdown("""
+### 📖 How to use:
+1. Download **'FX_Bridge.bat'** and place it inside your **MetaTrader Main Folder**.
+2. Run the file and copy the **8-digit ID**.
+3. Paste your code here and click **'Check Syntax'** to verify.
+4. Enter your ID and click **'Apply'**.
+""")
 
-# --- INSTRUCTIONS ---
-with st.expander("📖 User Instructions (English)", expanded=False):
-    st.markdown("""
-    1. **Download Bridge:** Get the `bridge.exe` from the link below and run it.
-    2. **Syntax Check:** Use the 'Check Syntax' button anytime to find code errors (No ID required).
-    3. **Live Injection:** Once code is ready, enter your **Bridge ID** and click 'Apply to MT4/MT5'.
-    """)
-
-# --- CODE AREA ---
+# --- EDITOR (White Background with MQL Syntax Highlighting) ---
 st.subheader("📝 MQL Editor")
-
-# This provides the White background and Syntax Highlighting (C++ style for MQL)
 mql_code = st_ace(
-    placeholder="// Write your MQL4/5 code here...",
-    language="c_cpp",
-    theme="chrome",  # This gives the white background
-    keybinding="vscode",
-    font_size=14,
+    placeholder="// Write your MQL4/5 indicator code here...",
+    language="c_cpp",  # Best for MQL syntax colors
+    theme="chrome",    # Pure white background
+    font_size=15,
     height=450,
     show_gutter=True,
     value="""// Built by FXCryptoTools
@@ -57,39 +54,35 @@ int OnCalculate(const int rates_total,
 }"""
 )
 
-# --- BUTTONS ---
 col1, col2 = st.columns(2)
 
 with col1:
-    if st.button("🔍 Check Syntax (Fast Test)"):
-        # This function works WITHOUT a token
-        st.info("Analyzing syntax structure...")
-        errors = []
-        if ";" not in mql_code and "{" in mql_code:
-            errors.append("Line missing semicolon (;)")
+    # --- SYNTAX CHECK (No Token Required) ---
+    if st.button("🔍 Check Syntax (Instant)"):
+        st.info("Analyzing Code...")
+        # Simple logic test
         if mql_code.count("{") != mql_code.count("}"):
-            errors.append("Mismatched curly brackets { }")
-        
-        if not errors:
-            st.success("✅ Basic Syntax looks good! (Structural Test Passed)")
+            st.error("❌ Error: Mismatched brackets { }")
+        elif ";" not in mql_code:
+            st.warning("⚠️ Warning: Semicolon (;) might be missing.")
         else:
-            for err in errors:
-                st.error(f"❌ {err}")
+            st.success("✅ Basic Syntax structure is correct!")
 
 with col2:
-    uid = st.text_input("Bridge ID:", placeholder="Enter ID from bridge.exe")
-    version = st.selectbox("Terminal Version:", ["MT4", "MT5"])
-    if st.button("⚡ Apply to MT4/MT5 Terminal"):
-        if not uid:
-            st.warning("Please enter your Bridge ID to inject code.")
+    # --- DEPLOY TO TERMINAL (Requires Token) ---
+    token = st.text_input("Enter Bridge Token:", placeholder="e.g. A1B2C3D4")
+    if st.button("⚡ Apply to MT4/MT5"):
+        if not token:
+            st.error("❌ Please enter your Token from the Bridge file.")
         else:
-            with st.spinner("Injecting to Remote Terminal..."):
+            with st.spinner("Sending code to your terminal..."):
                 try:
-                    relay_url = "https://your-relay-app.render.com/send_to_bridge"
-                    requests.post(relay_url, json={"uid": uid, "code": mql_code, "version": version})
-                    st.success(f"Sent! Check your terminal for ID: {uid}")
+                    # Your Relay Server URL (Render/Railway)
+                    relay_url = "https://your-relay-server.com/send"
+                    # requests.post(relay_url, json={"uid": token, "code": mql_code})
+                    st.success(f"Sent! Check your MetaTrader chart for ID: {token}")
                 except:
-                    st.error("Relay Server connection failed.")
+                    st.error("Server Connection Error.")
 
 st.markdown("---")
-st.markdown('<div class="footer">Powered by FXCryptoTools | Precision Trading Solutions</div>', unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; color:gray;'>Made by FXCryptoTools | English Version 2.0</p>", unsafe_allow_html=True)
