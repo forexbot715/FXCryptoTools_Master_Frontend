@@ -1,94 +1,95 @@
 import streamlit as st
+from streamlit_ace import st_ace
 import requests
 import time
+import re
 
-# --- CONFIGURATION ---
-RELAY_URL = "https://fxcryptotools-master.onrender.com"
+st.set_page_config(page_title="FXCryptoTools Terminal", layout="wide")
 
-st.set_page_config(page_title="FXCryptoTools Remote Terminal", layout="wide")
-
-# Custom CSS for better UI
+# --- CUSTOM CSS ---
 st.markdown("""
     <style>
-    .main { background-color: #0e1117; }
-    .stTextArea textarea { font-family: 'Courier New', monospace; background-color: #161a23; color: #00ff00; }
-    .stButton>button { width: 100%; border-radius: 5px; height: 3em; font-weight: bold; }
-    .check-btn>button { background-color: #2196F3; color: white; }
-    .apply-btn>button { background-color: #4CAF50; color: white; }
-    .footer { text-align: center; color: gray; padding: 20px; margin-top: 50px; border-top: 1px solid #333; }
+    .main { background-color: #f0f2f6; }
+    .stButton>button { width: 100%; border-radius: 5px; }
+    .footer { text-align: center; color: #888; padding: 20px; }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🚀 FXCryptoTools Remote Lab")
-st.caption("Professional MQL4/5 Development & Injection")
+st.title("🚀 FXCryptoTools MQL Lab")
+st.sidebar.title("💎 FXCryptoTools")
+st.sidebar.info("Professional Code Injection Hub")
 
 # --- INSTRUCTIONS ---
-with st.expander("📖 Setup Instructions", expanded=True):
-    c1, c2, c3 = st.columns(3)
-    c1.info("**1. Download Bridge**\nRun 'FX_Bridge.exe' on your PC to link your MT4/MT5.")
-    c2.info("**2. Get Your ID**\nCopy the 8-digit Unique ID from the Bridge window.")
-    c3.info("**3. Deploy**\nEnter ID below, paste code, and click Apply.")
+with st.expander("📖 User Instructions (English)", expanded=False):
+    st.markdown("""
+    1. **Download Bridge:** Get the `bridge.exe` from the link below and run it.
+    2. **Syntax Check:** Use the 'Check Syntax' button anytime to find code errors (No ID required).
+    3. **Live Injection:** Once code is ready, enter your **Bridge ID** and click 'Apply to MT4/MT5'.
+    """)
+
+# --- CODE AREA ---
+st.subheader("📝 MQL Editor")
+
+# This provides the White background and Syntax Highlighting (C++ style for MQL)
+mql_code = st_ace(
+    placeholder="// Write your MQL4/5 code here...",
+    language="c_cpp",
+    theme="chrome",  # This gives the white background
+    keybinding="vscode",
+    font_size=14,
+    height=450,
+    show_gutter=True,
+    value="""// Built by FXCryptoTools
+#property indicator_chart_window
+
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime &time[],
+                const double &open[],
+                const double &high[],
+                const double &low[],
+                const double &close[],
+                const long &tick_volume[],
+                const long &volume[],
+                const int &spread[])
+{
+   return(rates_total);
+}"""
+)
+
+# --- BUTTONS ---
+col1, col2 = st.columns(2)
+
+with col1:
+    if st.button("🔍 Check Syntax (Fast Test)"):
+        # This function works WITHOUT a token
+        st.info("Analyzing syntax structure...")
+        errors = []
+        if ";" not in mql_code and "{" in mql_code:
+            errors.append("Line missing semicolon (;)")
+        if mql_code.count("{") != mql_code.count("}"):
+            errors.append("Mismatched curly brackets { }")
+        
+        if not errors:
+            st.success("✅ Basic Syntax looks good! (Structural Test Passed)")
+        else:
+            for err in errors:
+                st.error(f"❌ {err}")
+
+with col2:
+    uid = st.text_input("Bridge ID:", placeholder="Enter ID from bridge.exe")
+    version = st.selectbox("Terminal Version:", ["MT4", "MT5"])
+    if st.button("⚡ Apply to MT4/MT5 Terminal"):
+        if not uid:
+            st.warning("Please enter your Bridge ID to inject code.")
+        else:
+            with st.spinner("Injecting to Remote Terminal..."):
+                try:
+                    relay_url = "https://your-relay-app.render.com/send_to_bridge"
+                    requests.post(relay_url, json={"uid": uid, "code": mql_code, "version": version})
+                    st.success(f"Sent! Check your terminal for ID: {uid}")
+                except:
+                    st.error("Relay Server connection failed.")
 
 st.markdown("---")
-
-# --- CODE AREA (TOP - FULL WIDTH) ---
-st.subheader("📝 MQL Code Editor")
-mql_code = st.text_area("Paste your MQL4 or MQL5 Code here:", height=500, placeholder="// Your indicator logic here...")
-
-# --- SETTINGS & BUTTONS (BELOW CODE) ---
-st.markdown("---")
-col_cfg, col_btns = st.columns([1, 1])
-
-with col_cfg:
-    st.subheader("⚙️ Connection Settings")
-    uid = st.text_input("Enter Bridge ID:", placeholder="Enter ID from Bridge.exe (e.g. A1B2C3D4)")
-    version = st.selectbox("Select Terminal Version:", ["MT4", "MT5"])
-
-with col_btns:
-    st.subheader("⚡ Actions")
-    # Action Buttons
-    st.markdown('<div class="check-btn">', unsafe_allow_html=True)
-    check_code = st.button("🔍 Check Code Syntax (Compiler Test)")
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown('<div class="apply-btn">', unsafe_allow_html=True)
-    apply_code = st.button("🚀 Apply Code to Terminal")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# --- RESULTS AREA ---
-if check_code or apply_code:
-    if not uid:
-        st.warning("⚠️ Please enter your Bridge ID first.")
-    elif not mql_code:
-        st.warning("⚠️ Code editor is empty.")
-    else:
-        with st.spinner("Processing request..."):
-            try:
-                # Send code to Relay
-                payload = {"uid": uid, "code": mql_code, "version": version}
-                requests.post(f"{RELAY_URL}/send_to_bridge", json=payload)
-                
-                # Wait for response
-                status_box = st.empty()
-                status_box.info("⌛ Communicating with your PC... Please wait.")
-                
-                # Polling for 10 seconds
-                for i in range(10):
-                    time.sleep(1.5)
-                    log_resp = requests.get(f"{RELAY_URL}/poll/{uid}").json()
-                    logs = log_resp.get("logs", "")
-                    
-                    if logs and "Waiting" not in logs:
-                        if "0 errors" in logs.lower():
-                            status_box.success("✅ SUCCESS: Compiled successfully with no errors.")
-                            if apply_code: st.balloons()
-                        else:
-                            status_box.error("❌ COMPILER ERROR:")
-                            st.code(logs)
-                        break
-                    if i == 9:
-                        status_box.warning("🕒 Timeout: Bridge did not respond. Is your EXE running?")
-            except Exception as e:
-                st.error(f"Connection Error: {e}")
-
-st.markdown('<div class="footer">Made by FXCryptoTools | Professional Algorithmic Trading Suite</div>', unsafe_allow_html=True)
+st.markdown('<div class="footer">Powered by FXCryptoTools | Precision Trading Solutions</div>', unsafe_allow_html=True)
