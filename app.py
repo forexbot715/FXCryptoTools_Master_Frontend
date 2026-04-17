@@ -3,83 +3,95 @@ from streamlit_ace import st_ace
 import requests
 import time
 
-# --- Page Configuration ---
+# --- Page Setup ---
 st.set_page_config(
-    page_title="FXCryptoTools | Remote MQL Lab",
+    page_title="FXC Remote Lab | FXCryptoTools",
     page_icon="🚀",
     layout="wide"
 )
 
-# --- Custom Professional Styling ---
+# --- Enhanced UI Styling ---
 st.markdown("""
     <style>
-    .main { background-color: #f4f7f9; }
-    .stButton>button { width: 100%; border-radius: 4px; font-weight: 600; height: 3em; }
+    .main { background-color: #f8fafc; }
+    .stButton>button { width: 100%; border-radius: 6px; font-weight: bold; height: 3.5em; border: none; }
     .instruction-card {
         background-color: white;
         padding: 20px;
-        border-radius: 10px;
-        border-left: 5px solid #28a745;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border-radius: 12px;
+        border-top: 4px solid #10b981;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         margin-bottom: 20px;
+        min-height: 180px;
     }
-    .step-header { color: #1a202c; font-size: 18px; font-weight: bold; margin-bottom: 10px; }
-    .footer { text-align: center; margin-top: 50px; color: #94a3b8; font-size: 14px; }
+    .tip-box {
+        background-color: #eff6ff;
+        border-left: 5px solid #3b82f6;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 10px;
+        color: #1e40af;
+    }
+    .footer { text-align: center; margin-top: 40px; color: #94a3b8; font-family: sans-serif; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- Header Section ---
-st.markdown("<h1 style='text-align: center; color: #1e293b;'>🚀 FXC Remote Development Lab</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #64748b;'>Compile and Deploy MQL4/5 Indicators Directly to your Terminal</p>", unsafe_allow_html=True)
+# --- Top Header ---
+st.markdown("<h1 style='text-align: center; color: #0f172a;'>🛠️ FXC Remote Development Lab</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #475569; font-size: 18px;'>Professional Environment to Code & Inject MQL4/5 Directly to MetaTrader</p>", unsafe_allow_html=True)
 
 st.divider()
 
-# --- PROFESSIONAL INSTRUCTIONS SECTION ---
-st.subheader("🛠️ Setup Instructions")
-col_step1, col_step2, col_step3, col_step4 = st.columns(4)
+# --- PROFESSIONAL INSTRUCTIONS ---
+st.subheader("📖 Quick Setup Guide")
+col1, col2, col3 = st.columns(3)
 
-with col_step1:
+with col1:
     st.markdown("""<div class="instruction-card">
-    <div class="step-header">Step 1: Download</div>
-    Download <b>FXC_Bridge.bat</b> from the button below.
+    <h4 style='color:#10b981;'>1. Download Bridge</h4>
+    Download the <b>FXC_Bridge.bat</b> script. This small file links this website to your MT4/MT5.
     </div>""", unsafe_allow_html=True)
-    # Put your actual file link here
-    st.download_button("📥 Download Bridge", data="Your_Batch_Code_Here", file_name="FXC_Bridge.bat")
+    # Placeholder for actual download link
+    st.download_button("📥 Download FXC_Bridge.bat", data="BATCH_CODE_HERE", file_name="FXC_Bridge.bat")
 
-with col_step2:
+with col2:
     st.markdown("""<div class="instruction-card">
-    <div class="step-header">Step 2: Relocate</div>
-    Copy the file into your <b>MetaTrader Installation Folder</b> (where terminal.exe is).
+    <h4 style='color:#10b981;'>2. Proper Location</h4>
+    Place the file inside your <b>MetaTrader Installation Folder</b> and Run it.
     </div>""", unsafe_allow_html=True)
+    
+    with st.expander("💡 Not sure where the folder is?"):
+        st.markdown("""
+        <div class="tip-box">
+        <b>The Easiest Way:</b><br>
+        1. Go to your Desktop.<br>
+        2. <b>Right-Click</b> your MetaTrader Icon.<br>
+        3. Select <b>'Open File Location'</b>.<br>
+        4. Paste the Bridge file right there!
+        </div>
+        """, unsafe_allow_html=True)
 
-with col_step3:
+with col3:
     st.markdown("""<div class="instruction-card">
-    <div class="step-header">Step 3: Connect</div>
-    Run the file. Enter an <b>8-digit Token</b> (e.g. FXC12345) and keep the window open.
-    </div>""", unsafe_allow_html=True)
-
-with col_step4:
-    st.markdown("""<div class="instruction-card">
-    <div class="step-header">Step 4: Deploy</div>
-    Paste your Token below and click <b>Apply</b>. Your indicator appears as <b>FXC_Remote</b>.
+    <h4 style='color:#10b981;'>3. Connect & Deploy</h4>
+    Enter an <b>8-digit Token</b> in the Bridge window, paste it below, and hit <b>Apply</b>.
     </div>""", unsafe_allow_html=True)
 
 st.divider()
 
-# --- MAIN TERMINAL AREA ---
-col_editor, col_controls = st.columns([1.5, 1])
+# --- EDITOR & TERMINAL ---
+col_edit, col_ctrl = st.columns([1.6, 1])
 
-with col_editor:
+with col_edit:
     st.subheader("📝 Professional MQL Editor")
-    # White background editor with MQL (C++) highlighting
+    # Clean White Editor with MQL Highlighting
     mql_code = st_ace(
-        placeholder="// Write your MQL4 or MQL5 code here...",
         language="c_cpp",
-        theme="chrome",  # Professional White Background
-        font_size=15,
+        theme="chrome",
         height=500,
+        font_size=15,
         show_gutter=True,
-        value="""// Built by FXCryptoTools
+        value="""// Developed by FXCryptoTools
 #property indicator_chart_window
 
 int OnCalculate(const int rates_total,
@@ -93,46 +105,43 @@ int OnCalculate(const int rates_total,
                 const long &volume[],
                 const int &spread[])
 {
-   // Add your logic here
+   // Inject logic here...
    return(rates_total);
 }"""
     )
 
-with col_controls:
-    st.subheader("⚡ Control Panel")
+with col_ctrl:
+    st.subheader("⚡ Deployment Control")
     
-    # Independent Syntax Test
-    st.markdown("### 1. Verification")
-    if st.button("🔍 Check Syntax (Instant Test)"):
-        with st.spinner("Analyzing code structure..."):
+    # Independent Test Button
+    if st.button("🔍 Check Syntax (Instant Analysis)"):
+        with st.spinner("Analyzing code..."):
             time.sleep(1)
-            # Basic validation logic
-            if "{" in mql_code and mql_code.count("{") != mql_code.count("}"):
-                st.error("❌ Syntax Error: Mismatched brackets { } detected.")
+            # Basic validation
+            if mql_code.count("{") != mql_code.count("}"):
+                st.error("❌ Syntax Error: Bracket mismatch { }.")
             elif ";" not in mql_code and "int" in mql_code:
-                st.warning("⚠️ Warning: Missing semicolons (;) found.")
+                st.warning("⚠️ Warning: Possible missing semicolon (;)")
             else:
-                st.success("✅ Structural Check Passed: Code looks valid.")
+                st.success("✅ Code structure appears valid!")
 
     st.markdown("---")
     
-    # Remote Deployment
-    st.markdown("### 2. Live Injection")
-    token_input = st.text_input("Enter your Bridge Token ID:", placeholder="e.g. FXC12345")
-    terminal_ver = st.selectbox("Target Terminal:", ["MT4", "MT5"])
+    # ID and Injection
+    user_token = st.text_input("Enter Bridge Token ID:", placeholder="e.g. MYCODE123")
+    target_ver = st.selectbox("Select Terminal:", ["MetaTrader 4", "MetaTrader 5"])
     
-    if st.button("🚀 Apply to MetaTrader"):
-        if not token_input:
-            st.error("❌ Token Required: Please enter your 8-digit ID from the Bridge.")
+    if st.button("🚀 Apply Code to Terminal"):
+        if not user_token:
+            st.error("❌ Token ID Required! Run the Bridge file on your PC to get it.")
         else:
-            with st.spinner(f"Injecting code into Terminal ID: {token_input}..."):
+            with st.spinner("Sending code to remote relay..."):
                 try:
-                    # Logic to send data to your Relay Server
-                    # requests.post("YOUR_RELAY_URL/send", json={"uid": token_input, "code": mql_code})
-                    st.success(f"Successfully Sent! Check your {terminal_ver} Indicators list for 'FXC_Remote'.")
+                    # Relay server logic here
+                    st.success(f"Injected! Check your {target_ver} Navigator for 'FXC_Remote'.")
                     st.balloons()
                 except:
-                    st.error("Relay Connection Failed. Please try again.")
+                    st.error("Relay Connection Failed.")
 
 # --- Footer ---
-st.markdown("<div class='footer'>© 2024 FXCryptoTools | Remote MQL Terminal v2.0 | English Version</div>", unsafe_allow_html=True)
+st.markdown("<div class='footer'>© 2024 FXCryptoTools | Remote MQL Terminal v2.1 | Secure & Fast</div>", unsafe_allow_html=True)
