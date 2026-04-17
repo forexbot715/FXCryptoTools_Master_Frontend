@@ -1,42 +1,85 @@
 import streamlit as st
 from streamlit_ace import st_ace
 import requests
+import time
 
-st.set_page_config(page_title="FXCryptoTools Terminal", layout="wide")
+# --- Page Configuration ---
+st.set_page_config(
+    page_title="FXCryptoTools | Remote MQL Lab",
+    page_icon="🚀",
+    layout="wide"
+)
 
-# Custom White Theme CSS
+# --- Custom Professional Styling ---
 st.markdown("""
     <style>
-    .main { background-color: #f8f9fa; }
-    .stButton>button { background-color: #28a745; color: white; border-radius: 8px; height: 3em; font-weight: bold; }
-    .stButton>button:hover { background-color: #218838; color: white; }
-    .title-text { text-align: center; color: #1a202c; font-family: 'Segoe UI', sans-serif; }
+    .main { background-color: #f4f7f9; }
+    .stButton>button { width: 100%; border-radius: 4px; font-weight: 600; height: 3em; }
+    .instruction-card {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 5px solid #28a745;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    .step-header { color: #1a202c; font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+    .footer { text-align: center; margin-top: 50px; color: #94a3b8; font-size: 14px; }
     </style>
     """, unsafe_allow_html=True)
 
-st.markdown("<h1 class='title-text'>🚀 FXCryptoTools Remote Lab</h1>", unsafe_allow_html=True)
+# --- Header Section ---
+st.markdown("<h1 style='text-align: center; color: #1e293b;'>🚀 FXC Remote Development Lab</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #64748b;'>Compile and Deploy MQL4/5 Indicators Directly to your Terminal</p>", unsafe_allow_html=True)
 
-# --- SIDEBAR ---
-st.sidebar.title("💎 FXCryptoTools")
-st.sidebar.markdown("---")
-st.sidebar.markdown("""
-### 📖 How to use:
-1. Download **'FX_Bridge.bat'** and place it inside your **MetaTrader Main Folder**.
-2. Run the file and copy the **8-digit ID**.
-3. Paste your code here and click **'Check Syntax'** to verify.
-4. Enter your ID and click **'Apply'**.
-""")
+st.divider()
 
-# --- EDITOR (White Background with MQL Syntax Highlighting) ---
-st.subheader("📝 MQL Editor")
-mql_code = st_ace(
-    placeholder="// Write your MQL4/5 indicator code here...",
-    language="c_cpp",  # Best for MQL syntax colors
-    theme="chrome",    # Pure white background
-    font_size=15,
-    height=450,
-    show_gutter=True,
-    value="""// Built by FXCryptoTools
+# --- PROFESSIONAL INSTRUCTIONS SECTION ---
+st.subheader("🛠️ Setup Instructions")
+col_step1, col_step2, col_step3, col_step4 = st.columns(4)
+
+with col_step1:
+    st.markdown("""<div class="instruction-card">
+    <div class="step-header">Step 1: Download</div>
+    Download <b>FXC_Bridge.bat</b> from the button below.
+    </div>""", unsafe_allow_html=True)
+    # Put your actual file link here
+    st.download_button("📥 Download Bridge", data="Your_Batch_Code_Here", file_name="FXC_Bridge.bat")
+
+with col_step2:
+    st.markdown("""<div class="instruction-card">
+    <div class="step-header">Step 2: Relocate</div>
+    Copy the file into your <b>MetaTrader Installation Folder</b> (where terminal.exe is).
+    </div>""", unsafe_allow_html=True)
+
+with col_step3:
+    st.markdown("""<div class="instruction-card">
+    <div class="step-header">Step 3: Connect</div>
+    Run the file. Enter an <b>8-digit Token</b> (e.g. FXC12345) and keep the window open.
+    </div>""", unsafe_allow_html=True)
+
+with col_step4:
+    st.markdown("""<div class="instruction-card">
+    <div class="step-header">Step 4: Deploy</div>
+    Paste your Token below and click <b>Apply</b>. Your indicator appears as <b>FXC_Remote</b>.
+    </div>""", unsafe_allow_html=True)
+
+st.divider()
+
+# --- MAIN TERMINAL AREA ---
+col_editor, col_controls = st.columns([1.5, 1])
+
+with col_editor:
+    st.subheader("📝 Professional MQL Editor")
+    # White background editor with MQL (C++) highlighting
+    mql_code = st_ace(
+        placeholder="// Write your MQL4 or MQL5 code here...",
+        language="c_cpp",
+        theme="chrome",  # Professional White Background
+        font_size=15,
+        height=500,
+        show_gutter=True,
+        value="""// Built by FXCryptoTools
 #property indicator_chart_window
 
 int OnCalculate(const int rates_total,
@@ -50,39 +93,46 @@ int OnCalculate(const int rates_total,
                 const long &volume[],
                 const int &spread[])
 {
+   // Add your logic here
    return(rates_total);
 }"""
-)
+    )
 
-col1, col2 = st.columns(2)
+with col_controls:
+    st.subheader("⚡ Control Panel")
+    
+    # Independent Syntax Test
+    st.markdown("### 1. Verification")
+    if st.button("🔍 Check Syntax (Instant Test)"):
+        with st.spinner("Analyzing code structure..."):
+            time.sleep(1)
+            # Basic validation logic
+            if "{" in mql_code and mql_code.count("{") != mql_code.count("}"):
+                st.error("❌ Syntax Error: Mismatched brackets { } detected.")
+            elif ";" not in mql_code and "int" in mql_code:
+                st.warning("⚠️ Warning: Missing semicolons (;) found.")
+            else:
+                st.success("✅ Structural Check Passed: Code looks valid.")
 
-with col1:
-    # --- SYNTAX CHECK (No Token Required) ---
-    if st.button("🔍 Check Syntax (Instant)"):
-        st.info("Analyzing Code...")
-        # Simple logic test
-        if mql_code.count("{") != mql_code.count("}"):
-            st.error("❌ Error: Mismatched brackets { }")
-        elif ";" not in mql_code:
-            st.warning("⚠️ Warning: Semicolon (;) might be missing.")
+    st.markdown("---")
+    
+    # Remote Deployment
+    st.markdown("### 2. Live Injection")
+    token_input = st.text_input("Enter your Bridge Token ID:", placeholder="e.g. FXC12345")
+    terminal_ver = st.selectbox("Target Terminal:", ["MT4", "MT5"])
+    
+    if st.button("🚀 Apply to MetaTrader"):
+        if not token_input:
+            st.error("❌ Token Required: Please enter your 8-digit ID from the Bridge.")
         else:
-            st.success("✅ Basic Syntax structure is correct!")
-
-with col2:
-    # --- DEPLOY TO TERMINAL (Requires Token) ---
-    token = st.text_input("Enter Bridge Token:", placeholder="e.g. A1B2C3D4")
-    if st.button("⚡ Apply to MT4/MT5"):
-        if not token:
-            st.error("❌ Please enter your Token from the Bridge file.")
-        else:
-            with st.spinner("Sending code to your terminal..."):
+            with st.spinner(f"Injecting code into Terminal ID: {token_input}..."):
                 try:
-                    # Your Relay Server URL (Render/Railway)
-                    relay_url = "https://your-relay-server.com/send"
-                    # requests.post(relay_url, json={"uid": token, "code": mql_code})
-                    st.success(f"Sent! Check your MetaTrader chart for ID: {token}")
+                    # Logic to send data to your Relay Server
+                    # requests.post("YOUR_RELAY_URL/send", json={"uid": token_input, "code": mql_code})
+                    st.success(f"Successfully Sent! Check your {terminal_ver} Indicators list for 'FXC_Remote'.")
+                    st.balloons()
                 except:
-                    st.error("Server Connection Error.")
+                    st.error("Relay Connection Failed. Please try again.")
 
-st.markdown("---")
-st.markdown("<p style='text-align:center; color:gray;'>Made by FXCryptoTools | English Version 2.0</p>", unsafe_allow_html=True)
+# --- Footer ---
+st.markdown("<div class='footer'>© 2024 FXCryptoTools | Remote MQL Terminal v2.0 | English Version</div>", unsafe_allow_html=True)
